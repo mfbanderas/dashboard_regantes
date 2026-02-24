@@ -6,7 +6,7 @@ import plotly.graph_objects as go
 
 # --- 1. CONFIGURACIÓN DE PÁGINA ---
 st.set_page_config(
-    page_title="Monitor Avance | AppRegantes",
+    page_title="Monitor Avance | Comunidades Regantes",
     page_icon="💧",
     layout="wide",
     initial_sidebar_state="collapsed"
