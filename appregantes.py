@@ -176,15 +176,25 @@ try:
         with g1:
             st.markdown(f"**<span style='color:{C_TEAL}'>📅 Evolución Diaria de Registros</span>**", unsafe_allow_html=True)
             if 'Fecha_dt' in df_filtered.columns and not df_filtered.empty:
-                df_filtered['Dia_dt'] = df_filtered['Fecha_dt'].dt.date
-                diario = df_filtered.groupby('Dia_dt').size().reset_index(name='N')
-                fig1 = px.line(diario, x='Dia_dt', y='N', markers=True, text='N')
+                # 1. Convertimos la fecha a formato string (DD-MM-YYYY) para evitar horas
+                df_filtered['Fecha'] = df_filtered['Fecha_dt'].dt.strftime('%d-%m-%Y')
+                
+                # 2. Agrupamos por la nueva columna 'Fecha'
+                diario = df_filtered.groupby('Fecha').size().reset_index(name='N')
+                
+                # 3. Graficamos indicando x='Fecha'
+                fig1 = px.line(diario, x='Fecha', y='N', markers=True, text='N')
                 fig1.update_traces(
                     line_color=C_TEAL, marker_color=C_AQUA, 
                     line_width=3, marker_size=10,
                     textposition="top center", textfont_size=16           
                 )
+                
                 fig1 = aplicar_estilo(fig1)
+                
+                # 4. Forzamos a Plotly a tratar el eje como categórico (solo los días exactos que existen)
+                fig1.update_xaxes(type='category', title_text='Fecha')
+                
                 st.plotly_chart(fig1, use_container_width=True)
             else:
                 st.info("Sin datos de fecha suficientes para graficar.")
