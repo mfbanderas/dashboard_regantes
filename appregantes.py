@@ -1,4 +1,5 @@
 # streamlit run appregantes.py
+# streamlit run appregantes.py
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -121,8 +122,16 @@ try:
             df_filtered = df 
 
         # --- CABECERA ---
-        st.markdown(f"<h1>Monitor de Avance | <span style='color:{C_AQUA}'>Comunidades de Regantes</span></h1>", unsafe_allow_html=True)
-        st.markdown("Visión general del registro y caracterización de las Comunidades de Regantes.")
+        col_logo, col_titulo = st.columns([1, 5])
+        
+        with col_logo:
+            # Si tu imagen se llama diferente a "logo.png", cambia el nombre justo aquí abajo
+            st.image("logo.png", use_container_width=True)
+            
+        with col_titulo:
+            st.markdown(f"<h1>Monitor de Avance | <span style='color:{C_AQUA}'>Comunidades de Regantes</span></h1>", unsafe_allow_html=True)
+            st.markdown("Visión general del registro y caracterización de las Comunidades de Regantes.")
+            
         st.markdown("<br>", unsafe_allow_html=True)
 
         # --- SECCIÓN KPIs ---
