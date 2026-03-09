@@ -126,20 +126,40 @@ def generar_dashboard(df_vista, meta_objetivo, mostrar_demarcacion=True):
     st.markdown("### Dinámica de Registro")
     g1, g2 = st.columns((2, 1))
     
-    with g1:
-        st.markdown(f"**<span style='color:{C_TEAL}'>📅 Evolución Diaria de Registros</span>**", unsafe_allow_html=True)
-        if 'Fecha_dt' in df_vista.columns and not df_vista.empty:
-            df_vista_evol = df_vista.copy()
-            df_vista_evol['Fecha'] = df_vista_evol['Fecha_dt'].dt.strftime('%d-%m-%Y')
-            diario = df_vista_evol.groupby('Fecha').size().reset_index(name='N')
-            
-            fig1 = px.line(diario, x='Fecha', y='N', markers=True, text='N')
-            fig1.update_traces(line_color=C_TEAL, marker_color=C_AQUA, line_width=3, marker_size=10, textposition="top center", textfont_size=16)
-            fig1 = aplicar_estilo(fig1)
-            fig1.update_xaxes(type='category', title_text='Fecha')
-            st.plotly_chart(fig1, use_container_width=True)
-        else:
-            st.info("Sin datos suficientes de fecha.")
+with g1:
+    st.markdown(f"**<span style='color:{C_TEAL}'>📅 Evolución Diaria de Registros</span>**", unsafe_allow_html=True)
+    
+    if 'Fecha_dt' in df_vista.columns and not df_vista.empty:
+        # 1. Agrupamos por el objeto datetime real (sin formatear a string todavía)
+        diario = df_vista.groupby('Fecha_dt').size().reset_index(name='N')
+        
+        # 2. Ordenamos cronológicamente de forma explícita
+        diario = diario.sort_values('Fecha_dt')
+        
+        # 3. Graficamos usando la columna datetime
+        fig1 = px.line(diario, x='Fecha_dt', y='N', markers=True, text='N')
+        
+        # 4. TRUCO: Le decimos a Plotly que use formato dd-mm-yyyy solo para mostrarlo
+        fig1.update_xaxes(
+            type='date',           # Asegura que sea un eje de tiempo
+            tickformat="%d-%m-%Y", # Formato visual en el eje
+            dtick="D1",            # (Opcional) Fuerza una marca por cada día
+            title_text='Fecha'
+        )
+        
+        fig1.update_traces(
+            line_color=C_TEAL, 
+            marker_color=C_AQUA, 
+            line_width=3, 
+            marker_size=10, 
+            textposition="top center", 
+            textfont_size=16
+        )
+        
+        fig1 = aplicar_estilo(fig1)
+        st.plotly_chart(fig1, use_container_width=True)
+    else:
+        st.info("Sin datos suficientes de fecha.")
         
     with g2:
         st.markdown(f"**<span style='color:{C_TEAL}'>📍 Registros por Provincia</span>**", unsafe_allow_html=True)

@@ -129,15 +129,36 @@ def generar_dashboard(df_vista, meta_objetivo, mostrar_demarcacion=True):
     
     with g1:
         st.markdown(f"**<span style='color:{C_TEAL}'>📅 Evolución Diaria de Registros</span>**", unsafe_allow_html=True)
+        
         if 'Fecha_dt' in df_vista.columns and not df_vista.empty:
-            df_vista_evol = df_vista.copy()
-            df_vista_evol['Fecha'] = df_vista_evol['Fecha_dt'].dt.strftime('%d-%m-%Y')
-            diario = df_vista_evol.groupby('Fecha').size().reset_index(name='N')
+            # 1. Agrupamos por la columna datetime (NO por el string)
+            diario = df_vista.groupby('Fecha_dt').size().reset_index(name='N')
             
-            fig1 = px.line(diario, x='Fecha', y='N', markers=True, text='N')
-            fig1.update_traces(line_color=C_TEAL, marker_color=C_AQUA, line_width=3, marker_size=10, textposition="top center", textfont_size=16)
+            # 2. Ordenamos cronológicamente de forma explícita
+            diario = diario.sort_values('Fecha_dt')
+            
+            # 3. Usamos la columna de fecha real en el eje X
+            fig1 = px.line(diario, x='Fecha_dt', y='N', markers=True, text='N')
+            
+            # 4. Ajustes de estilo y formato de fecha visual
+            fig1.update_traces(
+                line_color=C_TEAL, 
+                marker_color=C_AQUA, 
+                line_width=3, 
+                marker_size=10, 
+                textposition="top center", 
+                textfont_size=16
+            )
+            
             fig1 = aplicar_estilo(fig1)
-            fig1.update_xaxes(type='category', title_text='Fecha')
+            
+            # 5. La clave: Formatear el eje X sin romper el orden cronológico
+            fig1.update_xaxes(
+                type='date',           # IMPORTANTE: Mantener como tipo fecha
+                tickformat="%d-%m-%Y", # Formato visual dd-mm-aaaa
+                title_text='Fecha'
+            )
+            
             st.plotly_chart(fig1, use_container_width=True)
         else:
             st.info("Sin datos suficientes de fecha.")
