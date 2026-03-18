@@ -255,9 +255,9 @@ try:
             df_analisis = df[df['Fecha_dt'] > fecha_corte]
             
             # Metas para el nuevo empuje
-            meta_global = 52
-            meta_dh_guad = 25
-            meta_dh_med = 27
+            meta_global = 60
+            meta_dh_guad = 30
+            meta_dh_med = 30
         else:
             # Sin filtro (todo el estudio)
             df_analisis = df.copy()
